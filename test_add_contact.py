@@ -7,74 +7,103 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
 import unittest, time, re
 
+from contact import Contact
+
 
 class TestAddContact(unittest.TestCase):
     def setUp(self):
-        self.driver = webdriver.Firefox()
-        self.driver.implicitly_wait(30)
+        self.wd = webdriver.Firefox()
+        self.wd.implicitly_wait(30)
 
     def test_add_contact(self):
-        driver = self.driver
-        driver.get("http://localhost/")
-        driver.find_element_by_name("user").click()
-        driver.find_element_by_name("user").clear()
-        driver.find_element_by_name("user").send_keys("admin")
-        driver.find_element_by_name("pass").clear()
-        driver.find_element_by_name("pass").send_keys("secret")
-        driver.find_element_by_xpath("//input[@value='Login']").click()
-        driver.find_element_by_link_text("add new").click()
-        driver.find_element_by_name("firstname").click()
-        driver.find_element_by_name("firstname").clear()
-        driver.find_element_by_name("firstname").send_keys("Andrey")
-        driver.find_element_by_name("lastname").clear()
-        driver.find_element_by_name("lastname").send_keys("Kazakevich")
-        driver.find_element_by_name("title").clear()
-        driver.find_element_by_name("title").send_keys("Engineer")
-        driver.find_element_by_name("company").clear()
-        driver.find_element_by_name("company").send_keys("Bercut")
-        driver.find_element_by_name("home").clear()
-        driver.find_element_by_name("home").send_keys("4226668")
-        driver.find_element_by_name("mobile").clear()
-        driver.find_element_by_name("mobile").send_keys("89214226628")
-        driver.find_element_by_name("email").clear()
-        driver.find_element_by_name("email").send_keys("89214226628@mail.ru")
-        Select(driver.find_element_by_name("bday")).select_by_visible_text("4")
-        driver.find_element_by_name("bmonth").click()
-        Select(driver.find_element_by_name("bmonth")).select_by_visible_text("March")
-        driver.find_element_by_xpath("//option[@value='March']").click()
-        driver.find_element_by_name("byear").click()
-        driver.find_element_by_name("byear").clear()
-        driver.find_element_by_name("byear").send_keys("1995")
-        driver.find_element_by_name("address2").click()
-        driver.find_element_by_name("address2").clear()
-        driver.find_element_by_name("address2").send_keys("Russia")
-        driver.find_element_by_name("phone2").clear()
-        driver.find_element_by_name("phone2").send_keys("Saint-Petersburg")
-        driver.find_element_by_name("notes").clear()
-        driver.find_element_by_name("notes").send_keys("Hello everyone :)")
-        driver.find_element_by_xpath("(//input[@name='submit'])[2]").click()
-        driver.find_element_by_link_text("home page").click()
-        driver.find_element_by_link_text("Logout").click()
-        driver.find_element_by_name("user").clear()
-        driver.find_element_by_name("user").send_keys("admin")
+        wd = self.wd
+        self.open_home_page(wd)
+        self.login(wd, username="admin", password="secret")
+        self.create_contact(wd, Contact(firstname="Andrey", lastname="Kazakevich", title="Engineer", company="Bercut",
+                                        home_phone="4226668", mobile_phone="89214226628",
+                                        email="89214226628@mail.ru", bday="4", bmonth="March", byear="1995",
+                                        country="Russia",
+                                        city="Saint-Petersburg",
+                                        notes="Hello everyone :)"))
+        self.return_to_home_page(wd)
+        self.logout(wd)
+
+    def logout(self, wd):
+        wd.find_element_by_link_text("Logout").click()
+
+    def return_to_home_page(self, wd):
+        wd.find_element_by_link_text("home page").click()
+
+    def create_contact(self, wd, contact):
+        # init contact creation
+        wd.find_element_by_link_text("add new").click()
+        # fill contact form
+        # main information
+        wd.find_element_by_name("firstname").click()
+        wd.find_element_by_name("firstname").clear()
+        wd.find_element_by_name("firstname").send_keys(contact.firstname)
+        wd.find_element_by_name("lastname").clear()
+        wd.find_element_by_name("lastname").send_keys(contact.lastname)
+        wd.find_element_by_name("title").clear()
+        wd.find_element_by_name("title").send_keys(contact.title)
+        wd.find_element_by_name("company").clear()
+        wd.find_element_by_name("company").send_keys(contact.company)
+        wd.find_element_by_name("home").clear()
+        # telephone
+        wd.find_element_by_name("home").send_keys(contact.home_phone)
+        wd.find_element_by_name("mobile").clear()
+        wd.find_element_by_name("mobile").send_keys(contact.mobile_phone)
+        wd.find_element_by_name("email").clear()
+        # email
+        wd.find_element_by_name("email").send_keys(contact.email)
+        # birthday
+        Select(wd.find_element_by_name("bday")).select_by_visible_text(contact.bday)
+        wd.find_element_by_name("bmonth").click()
+        Select(wd.find_element_by_name("bmonth")).select_by_visible_text(contact.bmonth)
+        wd.find_element_by_xpath("//option[@value='March']").click()
+        wd.find_element_by_name("byear").click()
+        wd.find_element_by_name("byear").clear()
+        wd.find_element_by_name("byear").send_keys(contact.byear)
+        # address
+        wd.find_element_by_name("address2").click()
+        wd.find_element_by_name("address2").clear()
+        wd.find_element_by_name("address2").send_keys(contact.country)
+        wd.find_element_by_name("phone2").clear()
+        wd.find_element_by_name("phone2").send_keys(contact.city)
+        # notes
+        wd.find_element_by_name("notes").clear()
+        wd.find_element_by_name("notes").send_keys(contact.notes)
+        # submit contact creation
+        wd.find_element_by_xpath("(//input[@name='submit'])[2]").click()
+
+    def login(self, wd, username, password):
+        wd.find_element_by_name("user").click()
+        wd.find_element_by_name("user").clear()
+        wd.find_element_by_name("user").send_keys(username)
+        wd.find_element_by_name("pass").clear()
+        wd.find_element_by_name("pass").send_keys(password)
+        wd.find_element_by_xpath("//input[@value='Login']").click()
+
+    def open_home_page(self, wd):
+        wd.get("http://localhost/")
 
     def is_element_present(self, how, what):
         try:
-            self.driver.find_element(by=how, value=what)
+            self.wd.find_element(by=how, value=what)
         except NoSuchElementException as e:
             return False
         return True
 
     def is_alert_present(self):
         try:
-            self.driver.switch_to_alert()
+            self.wd.switch_to_alert()
         except NoAlertPresentException as e:
             return False
         return True
 
     def close_alert_and_get_its_text(self):
         try:
-            alert = self.driver.switch_to_alert()
+            alert = self.wd.switch_to_alert()
             alert_text = alert.text
             if self.accept_next_alert:
                 alert.accept()
@@ -85,7 +114,7 @@ class TestAddContact(unittest.TestCase):
             self.accept_next_alert = True
 
     def tearDown(self):
-        self.driver.quit()
+        self.wd.quit()
 
 
 if __name__ == "__main__":
