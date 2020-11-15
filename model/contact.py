@@ -17,3 +17,9 @@ class Contact:
         self.city = city
         self.notes = notes
         self.id = id
+
+    def __repr__(self):
+        return "%s:%s" % self.id
+
+    def __eq__(self, other):
+        return self.id == other.id
