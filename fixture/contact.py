@@ -39,7 +39,6 @@ class ContactHelper:
         if contact.bmonth != '-':
             wd.find_element_by_name("bmonth").click()
             Select(wd.find_element_by_name("bmonth")).select_by_visible_text(contact.bmonth)
-            wd.find_element_by_xpath("//option[@value='March']").click()
         self.change_field_value("byear", contact.byear)
         # address
         self.change_field_value("address2", contact.country)
