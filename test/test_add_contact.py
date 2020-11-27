@@ -49,7 +49,7 @@ testdata = [Contact(firstname=random_string("firstname", 20), lastname=random_st
                     email=random_email("@mail.ru", 10), email2=random_email("@yandex.ru", 15),
                     email3=random_email("@gmail.com", 20), bday=random_bday(), bmonth=random_bmonth(),
                     byear=random_byear("19"), country=random_string("country", 20),
-                    secondary_phone=random_number("+7(921)"), notes=random_string("notes", 20)) for i in range(10)]
+                    secondary_phone=random_number("+7(921)"), notes=random_string("notes", 20)) for i in range(5)]
 
 
 @pytest.mark.parametrize("contact", testdata, ids=[repr(x) for x in testdata])
