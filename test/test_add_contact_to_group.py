@@ -12,7 +12,10 @@ def test_add_contact_to_group(app):
     if len(db.get_contact_list()) == 0:
         app.contact.create(Contact(firstname="Andrey"))
     group = random.choice(db.get_group_list())
-    contact = random.choice(db.get_contact_list())
-    if contact not in db.get_contacts_in_group(group):
-        app.contact.add_contact_to_group(contact, group)
+    if len(db.get_contacts_not_in_group(group)) == 0:
+        app.contact.create(Contact(firstname="Andrey"))
+        contact = db.get_contacts_not_in_group(group)[0]
+    else:
+        contact = random.choice(db.get_contacts_not_in_group(group))
+    app.contact.add_contact_to_group(contact, group)
     assert contact in db.get_contacts_in_group(group)
